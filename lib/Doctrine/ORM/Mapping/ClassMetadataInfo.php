@@ -3258,6 +3258,20 @@ class ClassMetadataInfo implements ClassMetadata
             if (! empty($this->embeddedClasses[$property]['columnPrefix'])) {
                 $fieldMapping['columnName'] = $this->embeddedClasses[$property]['columnPrefix'] . $fieldMapping['columnName'];
             } elseif ($this->embeddedClasses[$property]['columnPrefix'] !== false) {
+                
+                // Fix some issue with Symfony 3.x and the doctrine:generate:entities command
+                // when using embeddable entities
+                                
+                if ($this->reflClass === null) {
+                    $this->reflClass = new ReflectionClass($this->getName() );
+                }
+
+                if ($embeddable->reflClass === null) {
+                    $embeddable->reflClass = new ReflectionClass($embeddable->getName() );
+                }
+                
+                // End of fix
+                
                 $fieldMapping['columnName'] = $this->namingStrategy
                     ->embeddedFieldToColumnName(
                         $property,
